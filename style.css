@@ -1,0 +1,464 @@
+.wrapper {
+  display: flex;
+  flex-direction: row;
+}
+.inputs-area {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: sans-serif;
+}
+
+.color-input {
+  font-family: monospace;
+}
+.color-input .color-name {
+  text-align: right;
+  white-space: nowrap;
+}
+.color-input .color-sample span {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ccc;
+}
+/*.color-input .color-code {
+  font-family: monospace;
+}*/
+.color-input  input {
+  width: 70px;
+  font-family: monospace;
+  font-size: 10px;
+}
+.color-input  input:placeholder {
+  font-family: monospace;
+  font-size: 10px;
+}
+
+.iphones-area {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-left: 20px;
+}
+.iphone {
+  margin: 0 10px 10px 0;
+  height: 150.9mm;
+  width: 75.7mm;
+  border: 1px solid #000;
+}
+
+.registerstart .app-logo {
+  display: block;
+  width: 40mm;
+  height: 40mm;
+  margin: 5mm auto;
+}
+
+.registerstart {
+  overflow: hidden;
+}
+
+.registerstart .id-and-password {
+  width: 100%;
+}
+.registerstart .id-and-password input {
+  box-sizing: border-box;
+  display: block;
+  width: 80%;
+  margin: 0 auto;
+  height: 8mm;
+  margin-top: 2.5mm;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+.registerstart .id-and-password input:first-child {
+  margin-top: 8mm;
+}
+.registerstart .login-btn {
+  box-sizing: border-box;
+  margin-top: 8mm;
+  display: block;
+  width: 80%;
+  margin: 8mm auto 0 auto;
+  height: 8mm;
+  border-radius: 5px;
+  border: none;
+  font-size: 15px;
+}
+
+.registerstart .navigation {
+  height: 8%;
+}
+
+.registerstart .contents {
+  overflow:hidden;
+  height: 92%;
+  position: relative;
+}
+
+.registerstart .register-btn {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 20mm;
+  width: 100%;
+  border: none;
+  font-size: 12pt;
+}
+
+.todolist .navigation {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  height: 8%;
+}
+.todolist .contents {
+  height: 92%;
+}
+
+.todolist .navigation .info-icon {
+  border-radius: 50%;
+  display: block;
+  width: 5mm;
+  height: 5mm;
+  line-height: 5mm;
+  text-align: center;
+  border-width: 1.5px;
+  border-style: solid;
+  font-family: 'Inconsolata', monospace;
+  margin-left: 5mm;
+}
+
+.todolist .navigation .segmented-ctl {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-radius: 5px;
+  height: 7mm;
+}
+
+.todolist .navigation svg {
+  margin-top: 1mm;
+}
+.todolist .navigation .plus-icon svg {
+  margin-right: 5mm;
+}
+
+.todolist .navigation .ctl-elem-off {
+  text-align: center;
+  width: 10mm;
+  height: 6mm;
+  margin: 0 0.5mm;
+  border-radius: 5px;
+}
+.todolist .navigation .ctl-elem-on {
+  box-sizing: border-box;
+  text-align: center;
+  width: 10mm;
+  height: 6mm;
+  margin: 0 0.5mm;
+  border-radius: 5px;
+}
+
+.todolist .contents .task-table {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+.todolist .contents .task-table .table-cell {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-family: 'Noto Sans JP', sans-serif;
+  height: 15mm;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  margin: 0 0 0 2.5mm;
+  padding-right: 2.5mm;
+}
+.todolist .contents .task-table li span {
+  font-size: 13px;
+  line-height: 55px;
+}
+.todolist .contents .task-table li .time-passed {
+  font-weight: bold;
+}
+.todolist .contents .task-table li .time-24 {
+  font-weight: bold;
+}
+
+.todolist .contents .task-table .table-cell-with-done {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  font-family: 'Noto Sans JP', sans-serif;
+  height: 15mm;
+  border-bottom: 1px solid #ccc;
+  margin: 0 0 0 2.5mm;
+  overflow: hidden;
+}
+.todolist .contents .task-table .table-cell-with-done span {
+  margin-left: 2mm;
+}
+.todolist .contents .task-table .table-cell-with-done .title-overflow {
+  transform: translate(-30mm, 0);
+}
+
+.todolist .contents .task-table .done-btn {
+  width: 15mm;
+  text-align: center;
+}
+
+
+.tododetail .navigation {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  height: 8%;
+}
+
+.tododetail .navigation .nav-title {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 15px;
+}
+
+.tododetail .content {
+  box-sizing: border-box;
+  padding: 10mm 5mm 20mm 5mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 92%;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+.tododetail .navigation .back-btn {
+  margin-left: 2mm;
+}
+.tododetail .navigation .back-btn .less-than-symbol {
+  display: inline-block;
+  font-family: 'Inconsolata', monospace;
+  transform: scale(1, 2);
+  margin-right: 1mm;
+}
+.tododetail .navigation .back-btn .back-text {
+  display: inline-block;
+  font-family: 'Inconsolata', monospace;
+}
+.tododetail .navigation .edit-btn {
+  margin-right: 2mm;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 15px;
+}
+.tododetail .content .done-btn {
+  border: none;
+  height: 10mm;
+  font-size: 17px;
+  border-radius: 5px;
+}
+
+
+.todoedit .navigation {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  height: 8%;
+}
+.todoedit .navigation .cancel-btn {
+  margin-left: 2mm;
+  font-size: 12px;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+.todoedit .navigation .complete-btn {
+  margin-right: 2mm;
+  font-size: 12px;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.todoedit .content {
+  height: 92%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 15px;
+}
+.todoedit .content .task-info {
+  width: 90%;
+}
+.todoedit .content .task-info .task-info-item {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4mm;
+}
+.todoedit .content .task-info .task-info-item input {
+  box-sizing: border-box;
+  height: 7mm;
+  border-radius: 2px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  padding: 2mm;
+}
+
+.todoedit .content .del-btn {
+  border: none;
+  height: 15mm;
+  width: 100%;
+  font-size: 17px;
+}
+
+
+.addtask .navigation {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  height: 8%;
+}
+.addtask .content {
+  height: 92%;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.addtask .navigation .cancel-btn {
+  margin-left: 2mm;
+  font-size: 12px;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+.addtask .navigation .complete-btn {
+  margin-right: 2mm;
+  font-size: 12px;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+.addtask .content .select-auto-person {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.addtask .content .whoisdoing input {
+  width: 100%;
+}
+.addtask .content .select-auto-person .switch {
+  display: inline-block;
+  width: 12mm;
+  height: 7.5mm;
+  border-radius: 30px;
+  position: relative;
+  margin-top: 1mm;
+}
+.addtask .content .select-auto-person .switch-content {
+  display: inline-block;
+  width: 6.5mm;
+  height: 6.5mm;
+  border-radius: 30px;
+  position: absolute;
+  top: 0.5mm;
+  right: 0.5mm;
+}
+.addtask .content .select-auto-person .switch-description {
+  margin-left: 1mm;
+}
+.addtask .content > * {
+  margin-top: 10mm;
+  width: 90%;
+}
+.addtask .content input {
+  box-sizing: border-box;
+  height: 7mm;
+  border-radius: 2px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  padding: 2mm;
+}
+
+
+.statistics .navigation {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  height: 8%;
+}
+.statistics .content {
+  height: 92%;
+}
+.statistics .navigation .nav-title {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 15px;
+}
+.statistics .navigation .back-btn {
+  margin-left: 2mm;
+}
+.statistics .navigation .back-btn .less-than-symbol {
+  display: inline-block;
+  font-family: 'Inconsolata', monospace;
+  transform: scale(1, 2);
+  margin-right: 1mm;
+}
+.statistics .navigation .back-btn .back-text {
+  display: inline-block;
+  font-family: 'Inconsolata', monospace;
+}
+.statistics .navigation .edit-btn {
+  margin-right: 2mm;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 12px;
+}
+.statistics .content .done-btn {
+  border: none;
+  height: 10mm;
+  font-size: 12px;
+  border-radius: 5px;
+}
+.statistics .content .bar-chart {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: flex-end;
+  width: 100%;
+  height: 70%;
+  margin-top: 20mm;
+  position: relative;
+}
+.statistics .content .bar-chart .bar-border {
+  position: absolute;
+  border-width: 0.5px;
+  border-style: solid;
+  width: 100%;
+  height: 0;
+  bottom: 5mm;
+}
+.statistics .content .bar-chart .bar-container {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+}
+.statistics .content .bar-chart .bar-container .bar {
+  margin: 0 auto;
+  width: 10mm;
+  flex: 1;
+}
+.statistics .content .bar-chart .bar-container .bar-value {
+  width: 10mm;
+  height: 6mm;
+  text-align: center;
+  margin: 0 auto;
+}
+.statistics .content .bar-chart .bar-container .bar-name {
+  text-align: center;
+  bottom: 6mm;
+}
