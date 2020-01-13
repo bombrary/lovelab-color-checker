@@ -164,8 +164,10 @@ view model =
 viewInputs : Model -> Html Msg
 viewInputs model =
   div [ class "inputs-area" ]
-    [ viewJsonIO model
-    , viewColorInputs model
+    [ div [ class "sticky-container" ]
+        [ viewJsonIO model
+        , viewColorInputs model
+        ]
     ]
 
 viewJsonIO : Model -> Html Msg

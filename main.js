@@ -6124,8 +6124,17 @@ var $author$project$Main$viewInputs = function (model) {
 			]),
 		_List_fromArray(
 			[
-				$author$project$Main$viewJsonIO(model),
-				$author$project$Main$viewColorInputs(model)
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('sticky-container')
+					]),
+				_List_fromArray(
+					[
+						$author$project$Main$viewJsonIO(model),
+						$author$project$Main$viewColorInputs(model)
+					]))
 			]));
 };
 var $elm$json$Json$Encode$bool = _Json_wrap;

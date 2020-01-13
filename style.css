@@ -9,6 +9,11 @@ h1,h2 {
   margin: 0 200px;
   margin-top: 50px;
 }
+@media screen and (max-width: 750px) {
+  .app-description {
+    margin: 20px;
+  }
+}
 .app-description p {
   margin: 10px;
 }
@@ -27,12 +32,28 @@ h1,h2 {
   display: flex;
   flex-direction: row;
 }
+@media screen and (max-width: 750px) {
+  .wrapper {
+    margin: 20px 10px;
+  }
+}
+
+.inputs-area {
+  padding: 10px;
+}
+
+.sticky-container {
+  position: sticky;
+  top: 20px;
+}
 
 .color-inputs {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   font-family: sans-serif;
+  height: 80vh;
+  overflow: scroll;
 }
 
 .color-input {
