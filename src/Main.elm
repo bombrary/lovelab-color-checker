@@ -164,8 +164,8 @@ view model =
 viewInputs : Model -> Html Msg
 viewInputs model =
   div [ class "inputs-area" ]
-    [ viewColorInputs model
-    , viewJsonIO model
+    [ viewJsonIO model
+    , viewColorInputs model
     ]
 
 viewJsonIO : Model -> Html Msg
@@ -199,15 +199,15 @@ viewJsonStatus status =
   case status of
     Idle ->
       p []
-        [ text "" ]
+        [ text "Status: Idle" ]
 
     Succeed ->
       p []
-        [ text "Loaded." ]
+        [ text "Status: Loaded." ]
 
     Opening ->
       p []
-        [ text "Opening..." ]
+        [ text "Status: Opening..." ]
 
     Failed message ->
       p []

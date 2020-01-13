@@ -6036,7 +6036,7 @@ var $author$project$Main$viewJsonStatus = function (status) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('')
+						$elm$html$Html$text('Status: Idle')
 					]));
 		case 'Succeed':
 			return A2(
@@ -6044,7 +6044,7 @@ var $author$project$Main$viewJsonStatus = function (status) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Loaded.')
+						$elm$html$Html$text('Status: Loaded.')
 					]));
 		case 'Opening':
 			return A2(
@@ -6052,7 +6052,7 @@ var $author$project$Main$viewJsonStatus = function (status) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Opening...')
+						$elm$html$Html$text('Status: Opening...')
 					]));
 		default:
 			var message = status.a;
@@ -6124,8 +6124,8 @@ var $author$project$Main$viewInputs = function (model) {
 			]),
 		_List_fromArray(
 			[
-				$author$project$Main$viewColorInputs(model),
-				$author$project$Main$viewJsonIO(model)
+				$author$project$Main$viewJsonIO(model),
+				$author$project$Main$viewColorInputs(model)
 			]));
 };
 var $elm$json$Json$Encode$bool = _Json_wrap;
