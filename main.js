@@ -5952,21 +5952,30 @@ var $author$project$Main$colorInput = F2(
 					_List_fromArray(
 						[
 							A2(
-							$elm$html$Html$input,
+							$elm$html$Html$div,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$type_('color'),
-									$elm$html$Html$Attributes$value(
-									$author$project$Main$normalizeColor(
-										A2($author$project$Main$color, colorName, colors))),
-									$elm$html$Html$Events$onInput(
-									$author$project$Main$Changed(colorName)),
+									$elm$html$Html$Attributes$class('color-sample-input'),
 									A2(
 									$elm$html$Html$Attributes$style,
 									'background-color',
 									A2($author$project$Main$color, colorName, colors))
 								]),
-							_List_Nil)
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$input,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$type_('color'),
+											$elm$html$Html$Attributes$value(
+											$author$project$Main$normalizeColor(
+												A2($author$project$Main$color, colorName, colors))),
+											$elm$html$Html$Events$onInput(
+											$author$project$Main$Changed(colorName))
+										]),
+									_List_Nil)
+								]))
 						])),
 					A2(
 					$elm$html$Html$td,

@@ -228,13 +228,17 @@ colorInput { inputs, colors } colorName =
     [ td [ class "color-name" ]
         [ text (colorName ++ ": ") ]
     , td [ class "color-sample" ]
-        [ input
-            [ type_ "color"
-            , value (normalizeColor (color colorName colors))
-            , onInput (Changed colorName)
+        [ div
+            [ class "color-sample-input"
             , style "background-color" (color colorName colors)
             ]
-            []
+            [ input
+              [ type_ "color"
+              , value (normalizeColor (color colorName colors))
+              , onInput (Changed colorName)
+              ]
+              []
+            ]
         ]
     , td []
         [ input
