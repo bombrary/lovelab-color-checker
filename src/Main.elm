@@ -9,6 +9,12 @@ import Parser as P exposing (Parser)
 import Svg as S exposing (Svg)
 import Svg.Attributes as SA
 import Svg.Events as SE
+import Json.Encode as E
+import Json.Decode as D
+import File exposing (File)
+import File.Download as Download
+import File.Select as Select
+import Task
 
 main =
   Browser.element
@@ -22,9 +28,15 @@ main =
 type alias Model =
   { inputs: Colors
   , colors: Colors
+  , status: LoadJsonStatus
   }
 
 type alias Colors = Dict String String
+type LoadJsonStatus
+  = Idle
+  | Succeed
+  | Failed String
+  | Opening
 
 
 initialColors : List (String, String)
@@ -32,27 +44,27 @@ initialColors =
   [ ("bg", "#fff")
   , ("fg", "#000")
   , ("nav-bg", "#eee")
-  , ("nav-fg", "#007AFF")
+  , ("nav-fg", "#007aff")
   , ("nav-border", "#ccc")
   , ("nav-title-fg", "#000")
-  , ("login-bg", "#007AFF")
+  , ("login-bg", "#007aff")
   , ("login-fg", "#fff")
-  , ("register-bg", "#E8EFFF")
-  , ("register-fg", "#007AFF")
+  , ("register-bg", "#e8efff")
+  , ("register-fg", "#007aff")
   , ("segctl-bg", "#ccc")
   , ("segctl-on-bg", "#fff")
   , ("donebtn-fg", "#fff")
-  , ("donebtn-bg", "#34C759")
+  , ("donebtn-bg", "#34c759")
   , ("cell-border", "#ccc")
   , ("nav-fg-disabled", "#aaa")
   , ("cell-deadline", "#f68")
   , ("cell-remain24", "#f80")
   , ("delbtn-fg", "#fff")
-  , ("delbtn-bg", "#FF3B30")
+  , ("delbtn-bg", "#ff3b30")
   , ("switch-bg", "#34c759")
   , ("switch", "#fff")
   , ("bar", "#007aff")
-  , ("bar-max", "#FF9500")
+  , ("bar-max", "#ff9500")
   , ("bar-border", "#888")
   , ("barlabel-fg", "#888")
   ]
@@ -60,14 +72,19 @@ initialColors =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( { inputs = Dict.fromList initialColors
+  ( { inputs = Dict.empty
     , colors = Dict.fromList initialColors
+    , status = Idle
     }
   , Cmd.none
   )
 
 type Msg
   = Changed Id String
+  | SaveRequested
+  | OpenRequested
+  | JsonSelected File
+  | JsonLoadResult (Result String (Dict String String))
 
 type alias Id = String
 
@@ -76,19 +93,65 @@ update msg model =
   case msg of
     Changed id string ->
       let colors = Dict.insert id string model.colors
+          inputs = Dict.insert id string model.inputs
       in
       case validColor string of
         Just _ ->
-          ( { inputs = colors
-            , colors = colors
+          ( { model | inputs = inputs
+                    , colors = colors
             }
           , Cmd.none
           )
 
         Nothing ->
-          ( { model | inputs = colors }
+          ( { model | inputs = inputs }
           , Cmd.none
           )
+
+    SaveRequested ->
+      ( model
+      , Download.string "colors.json" "application/json"
+          <| E.encode 2 (E.dict identity E.string model.colors)
+      )
+    
+    OpenRequested ->
+      ( model
+      , Select.file ["application/json"] JsonSelected
+      )
+
+    JsonSelected file ->
+      let decode = D.decodeString (D.dict D.string)
+          task = File.toString file
+                  |> Task.andThen
+                       (\string -> 
+                          case decode string of
+                            Ok dict ->
+                              Task.succeed dict
+
+                            Err jsonError ->
+                              Task.fail (D.errorToString jsonError)
+                        )
+      in
+      ( { model | status = Opening }
+      , Task.attempt JsonLoadResult task
+      )
+
+    JsonLoadResult result ->
+      case result of
+        Err message ->
+          ( { model | status = Failed message }
+          , Cmd.none
+          )
+
+        Ok colors ->
+          ( { model | status = Succeed
+                    , inputs = Dict.empty
+                    , colors = colors
+            }
+          , Cmd.none
+          )
+
+
 
 
 view : Model -> Html Msg
@@ -102,7 +165,53 @@ viewInputs : Model -> Html Msg
 viewInputs model =
   div [ class "inputs-area" ]
     [ viewColorInputs model
+    , viewJsonIO model
     ]
+
+viewJsonIO : Model -> Html Msg
+viewJsonIO model =
+  div
+    [ class "json-io"
+    ]
+    [ div
+        [ class "json-io-inputs"
+        ]
+        [ button
+            [ onClick SaveRequested
+            ]
+            [ text "Save"
+            ]
+        , button
+            [ onClick OpenRequested
+            ]
+            [ text "Open"
+            ]
+        ]
+    , div
+        [ class "json-io-status"
+        ]
+        [ viewJsonStatus model.status
+        ]
+    ]
+
+viewJsonStatus : LoadJsonStatus -> Html Msg
+viewJsonStatus status =
+  case status of
+    Idle ->
+      p []
+        [ text "" ]
+
+    Succeed ->
+      p []
+        [ text "Loaded." ]
+
+    Opening ->
+      p []
+        [ text "Opening..." ]
+
+    Failed message ->
+      p []
+        [ text ("Error: " ++ message) ]
 
 viewColorInputs : Model -> Html Msg
 viewColorInputs model =
@@ -112,22 +221,26 @@ viewColorInputs model =
                |> List.map Tuple.first))
 
 colorInput : Model -> String -> Html Msg
-colorInput { inputs, colors } string =
+colorInput { inputs, colors } colorName =
   tr [ class "color-input" ]
     [ td [ class "color-name" ]
-        [ text (string ++ ": ") ]
+        [ text (colorName ++ ": ") ]
     , td [ class "color-sample" ]
-        [ span 
-            [ style "background-color" (color string colors)
+        [ input
+            [ type_ "color"
+            , value (normalizeColor (color colorName colors))
+            , onInput (Changed colorName)
+            , style "background-color" (color colorName colors)
             ]
             []
         ]
     , td []
         [ input
-          [ onInput (Changed string)
-          , placeholder (String.toLower (color string colors))
-          ]
-          []
+            [ onInput (Changed colorName)
+            , placeholder (String.toLower (color colorName colors))
+            , value (Maybe.withDefault "" (Dict.get colorName inputs))
+            ]
+            []
         ]
     ] 
 
@@ -679,6 +792,17 @@ isHex c =
         'e' -> True
         'f' -> True
         _ -> False
+      
+normalizeColor : String -> String
+normalizeColor string =
+  let charList = String.toList string
+  in
+  case charList of
+    ['#',a,b,c] ->
+      String.fromList ['#',a,a,b,b,c,c]
+
+    _ ->
+      string
 
 subscriptions : Model -> Sub Msg
 subscriptions model =

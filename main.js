@@ -4355,6 +4355,184 @@ function _Browser_load(url)
 		}
 	}));
 }
+
+
+
+// DECODER
+
+var _File_decoder = _Json_decodePrim(function(value) {
+	// NOTE: checks if `File` exists in case this is run on node
+	return (typeof File !== 'undefined' && value instanceof File)
+		? $elm$core$Result$Ok(value)
+		: _Json_expecting('a FILE', value);
+});
+
+
+// METADATA
+
+function _File_name(file) { return file.name; }
+function _File_mime(file) { return file.type; }
+function _File_size(file) { return file.size; }
+
+function _File_lastModified(file)
+{
+	return $elm$time$Time$millisToPosix(file.lastModified);
+}
+
+
+// DOWNLOAD
+
+var _File_downloadNode;
+
+function _File_getDownloadNode()
+{
+	return _File_downloadNode || (_File_downloadNode = document.createElement('a'));
+}
+
+var _File_download = F3(function(name, mime, content)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var blob = new Blob([content], {type: mime});
+
+		// for IE10+
+		if (navigator.msSaveOrOpenBlob)
+		{
+			navigator.msSaveOrOpenBlob(blob, name);
+			return;
+		}
+
+		// for HTML5
+		var node = _File_getDownloadNode();
+		var objectUrl = URL.createObjectURL(blob);
+		node.href = objectUrl;
+		node.download = name;
+		_File_click(node);
+		URL.revokeObjectURL(objectUrl);
+	});
+});
+
+function _File_downloadUrl(href)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var node = _File_getDownloadNode();
+		node.href = href;
+		node.download = '';
+		node.origin === location.origin || (node.target = '_blank');
+		_File_click(node);
+	});
+}
+
+
+// IE COMPATIBILITY
+
+function _File_makeBytesSafeForInternetExplorer(bytes)
+{
+	// only needed by IE10 and IE11 to fix https://github.com/elm/file/issues/10
+	// all other browsers can just run `new Blob([bytes])` directly with no problem
+	//
+	return new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+}
+
+function _File_click(node)
+{
+	// only needed by IE10 and IE11 to fix https://github.com/elm/file/issues/11
+	// all other browsers have MouseEvent and do not need this conditional stuff
+	//
+	if (typeof MouseEvent === 'function')
+	{
+		node.dispatchEvent(new MouseEvent('click'));
+	}
+	else
+	{
+		var event = document.createEvent('MouseEvents');
+		event.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+		document.body.appendChild(node);
+		node.dispatchEvent(event);
+		document.body.removeChild(node);
+	}
+}
+
+
+// UPLOAD
+
+var _File_node;
+
+function _File_uploadOne(mimes)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		_File_node = document.createElement('input');
+		_File_node.type = 'file';
+		_File_node.accept = A2($elm$core$String$join, ',', mimes);
+		_File_node.addEventListener('change', function(event)
+		{
+			callback(_Scheduler_succeed(event.target.files[0]));
+		});
+		_File_click(_File_node);
+	});
+}
+
+function _File_uploadOneOrMore(mimes)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		_File_node = document.createElement('input');
+		_File_node.type = 'file';
+		_File_node.multiple = true;
+		_File_node.accept = A2($elm$core$String$join, ',', mimes);
+		_File_node.addEventListener('change', function(event)
+		{
+			var elmFiles = _List_fromArray(event.target.files);
+			callback(_Scheduler_succeed(_Utils_Tuple2(elmFiles.a, elmFiles.b)));
+		});
+		_File_click(_File_node);
+	});
+}
+
+
+// CONTENT
+
+function _File_toString(blob)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var reader = new FileReader();
+		reader.addEventListener('loadend', function() {
+			callback(_Scheduler_succeed(reader.result));
+		});
+		reader.readAsText(blob);
+		return function() { reader.abort(); };
+	});
+}
+
+function _File_toBytes(blob)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var reader = new FileReader();
+		reader.addEventListener('loadend', function() {
+			callback(_Scheduler_succeed(new DataView(reader.result)));
+		});
+		reader.readAsArrayBuffer(blob);
+		return function() { reader.abort(); };
+	});
+}
+
+function _File_toUrl(blob)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var reader = new FileReader();
+		reader.addEventListener('loadend', function() {
+			callback(_Scheduler_succeed(reader.result));
+		});
+		reader.readAsDataURL(blob);
+		return function() { reader.abort(); };
+	});
+}
+
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5144,6 +5322,7 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$Idle = {$: 'Idle'};
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Dict$Black = {$: 'Black'};
@@ -5272,27 +5451,27 @@ var $author$project$Main$initialColors = _List_fromArray(
 		_Utils_Tuple2('bg', '#fff'),
 		_Utils_Tuple2('fg', '#000'),
 		_Utils_Tuple2('nav-bg', '#eee'),
-		_Utils_Tuple2('nav-fg', '#007AFF'),
+		_Utils_Tuple2('nav-fg', '#007aff'),
 		_Utils_Tuple2('nav-border', '#ccc'),
 		_Utils_Tuple2('nav-title-fg', '#000'),
-		_Utils_Tuple2('login-bg', '#007AFF'),
+		_Utils_Tuple2('login-bg', '#007aff'),
 		_Utils_Tuple2('login-fg', '#fff'),
-		_Utils_Tuple2('register-bg', '#E8EFFF'),
-		_Utils_Tuple2('register-fg', '#007AFF'),
+		_Utils_Tuple2('register-bg', '#e8efff'),
+		_Utils_Tuple2('register-fg', '#007aff'),
 		_Utils_Tuple2('segctl-bg', '#ccc'),
 		_Utils_Tuple2('segctl-on-bg', '#fff'),
 		_Utils_Tuple2('donebtn-fg', '#fff'),
-		_Utils_Tuple2('donebtn-bg', '#34C759'),
+		_Utils_Tuple2('donebtn-bg', '#34c759'),
 		_Utils_Tuple2('cell-border', '#ccc'),
 		_Utils_Tuple2('nav-fg-disabled', '#aaa'),
 		_Utils_Tuple2('cell-deadline', '#f68'),
 		_Utils_Tuple2('cell-remain24', '#f80'),
 		_Utils_Tuple2('delbtn-fg', '#fff'),
-		_Utils_Tuple2('delbtn-bg', '#FF3B30'),
+		_Utils_Tuple2('delbtn-bg', '#ff3b30'),
 		_Utils_Tuple2('switch-bg', '#34c759'),
 		_Utils_Tuple2('switch', '#fff'),
 		_Utils_Tuple2('bar', '#007aff'),
-		_Utils_Tuple2('bar-max', '#FF9500'),
+		_Utils_Tuple2('bar-max', '#ff9500'),
 		_Utils_Tuple2('bar-border', '#888'),
 		_Utils_Tuple2('barlabel-fg', '#888')
 	]);
@@ -5302,7 +5481,8 @@ var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 		{
 			colors: $elm$core$Dict$fromList($author$project$Main$initialColors),
-			inputs: $elm$core$Dict$fromList($author$project$Main$initialColors)
+			inputs: $elm$core$Dict$empty,
+			status: $author$project$Main$Idle
 		},
 		$elm$core$Platform$Cmd$none);
 };
@@ -5311,6 +5491,112 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$none;
 };
+var $author$project$Main$Failed = function (a) {
+	return {$: 'Failed', a: a};
+};
+var $author$project$Main$JsonLoadResult = function (a) {
+	return {$: 'JsonLoadResult', a: a};
+};
+var $author$project$Main$JsonSelected = function (a) {
+	return {$: 'JsonSelected', a: a};
+};
+var $author$project$Main$Opening = {$: 'Opening'};
+var $author$project$Main$Succeed = {$: 'Succeed'};
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$core$Task$onError = _Scheduler_onError;
+var $elm$core$Task$attempt = F2(
+	function (resultToMessage, task) {
+		return $elm$core$Task$command(
+			$elm$core$Task$Perform(
+				A2(
+					$elm$core$Task$onError,
+					A2(
+						$elm$core$Basics$composeL,
+						A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
+						$elm$core$Result$Err),
+					A2(
+						$elm$core$Task$andThen,
+						A2(
+							$elm$core$Basics$composeL,
+							A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
+							$elm$core$Result$Ok),
+						task))));
+	});
+var $elm$json$Json$Decode$decodeString = _Json_runOnString;
+var $elm$json$Json$Decode$keyValuePairs = _Json_decodeKeyValuePairs;
+var $elm$json$Json$Decode$dict = function (decoder) {
+	return A2(
+		$elm$json$Json$Decode$map,
+		$elm$core$Dict$fromList,
+		$elm$json$Json$Decode$keyValuePairs(decoder));
+};
+var $elm$core$Dict$foldl = F3(
+	function (func, acc, dict) {
+		foldl:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return acc;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$func = func,
+					$temp$acc = A3(
+					func,
+					key,
+					value,
+					A3($elm$core$Dict$foldl, func, acc, left)),
+					$temp$dict = right;
+				func = $temp$func;
+				acc = $temp$acc;
+				dict = $temp$dict;
+				continue foldl;
+			}
+		}
+	});
+var $elm$json$Json$Encode$dict = F3(
+	function (toKey, toValue, dictionary) {
+		return _Json_wrap(
+			A3(
+				$elm$core$Dict$foldl,
+				F3(
+					function (key, value, obj) {
+						return A3(
+							_Json_addField,
+							toKey(key),
+							toValue(value),
+							obj);
+					}),
+				_Json_emptyObject(_Utils_Tuple0),
+				dictionary));
+	});
+var $elm$core$Task$fail = _Scheduler_fail;
+var $elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
+var $elm$file$File$Select$file = F2(
+	function (mimes, toMsg) {
+		return A2(
+			$elm$core$Task$perform,
+			toMsg,
+			_File_uploadOne(mimes));
+	});
+var $elm$file$File$Download$string = F3(
+	function (name, mime, content) {
+		return A2(
+			$elm$core$Task$perform,
+			$elm$core$Basics$never,
+			A3(_File_download, name, mime, content));
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$file$File$toString = _File_toString;
 var $elm$core$String$fromList = _String_fromList;
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
@@ -5421,23 +5707,89 @@ var $author$project$Main$validColor = function (string) {
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		var id = msg.a;
-		var string = msg.b;
-		var colors = A3($elm$core$Dict$insert, id, string, model.colors);
-		var _v1 = $author$project$Main$validColor(string);
-		if (_v1.$ === 'Just') {
-			return _Utils_Tuple2(
-				{colors: colors, inputs: colors},
-				$elm$core$Platform$Cmd$none);
-		} else {
-			return _Utils_Tuple2(
-				_Utils_update(
+		switch (msg.$) {
+			case 'Changed':
+				var id = msg.a;
+				var string = msg.b;
+				var inputs = A3($elm$core$Dict$insert, id, string, model.inputs);
+				var colors = A3($elm$core$Dict$insert, id, string, model.colors);
+				var _v1 = $author$project$Main$validColor(string);
+				if (_v1.$ === 'Just') {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{colors: colors, inputs: inputs}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{inputs: inputs}),
+						$elm$core$Platform$Cmd$none);
+				}
+			case 'SaveRequested':
+				return _Utils_Tuple2(
 					model,
-					{inputs: colors}),
-				$elm$core$Platform$Cmd$none);
+					A3(
+						$elm$file$File$Download$string,
+						'colors.json',
+						'application/json',
+						A2(
+							$elm$json$Json$Encode$encode,
+							2,
+							A3($elm$json$Json$Encode$dict, $elm$core$Basics$identity, $elm$json$Json$Encode$string, model.colors))));
+			case 'OpenRequested':
+				return _Utils_Tuple2(
+					model,
+					A2(
+						$elm$file$File$Select$file,
+						_List_fromArray(
+							['application/json']),
+						$author$project$Main$JsonSelected));
+			case 'JsonSelected':
+				var file = msg.a;
+				var decode = $elm$json$Json$Decode$decodeString(
+					$elm$json$Json$Decode$dict($elm$json$Json$Decode$string));
+				var task = A2(
+					$elm$core$Task$andThen,
+					function (string) {
+						var _v2 = decode(string);
+						if (_v2.$ === 'Ok') {
+							var dict = _v2.a;
+							return $elm$core$Task$succeed(dict);
+						} else {
+							var jsonError = _v2.a;
+							return $elm$core$Task$fail(
+								$elm$json$Json$Decode$errorToString(jsonError));
+						}
+					},
+					$elm$file$File$toString(file));
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{status: $author$project$Main$Opening}),
+					A2($elm$core$Task$attempt, $author$project$Main$JsonLoadResult, task));
+			default:
+				var result = msg.a;
+				if (result.$ === 'Err') {
+					var message = result.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								status: $author$project$Main$Failed(message)
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					var colors = result.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{colors: colors, inputs: $elm$core$Dict$empty, status: $author$project$Main$Succeed}),
+						$elm$core$Platform$Cmd$none);
+				}
 		}
 	});
-var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -5493,6 +5845,30 @@ var $author$project$Main$color = F2(
 		}
 	});
 var $elm$html$Html$input = _VirtualDom_node('input');
+var $author$project$Main$normalizeColor = function (string) {
+	var charList = $elm$core$String$toList(string);
+	if (((((charList.b && ('#' === charList.a.valueOf())) && charList.b.b) && charList.b.b.b) && charList.b.b.b.b) && (!charList.b.b.b.b.b)) {
+		var _v1 = charList.b;
+		var a = _v1.a;
+		var _v2 = _v1.b;
+		var b = _v2.a;
+		var _v3 = _v2.b;
+		var c = _v3.a;
+		return $elm$core$String$fromList(
+			_List_fromArray(
+				[
+					_Utils_chr('#'),
+					a,
+					a,
+					b,
+					b,
+					c,
+					c
+				]));
+	} else {
+		return string;
+	}
+};
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -5512,7 +5888,6 @@ var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
 	});
-var $elm$json$Json$Decode$string = _Json_decodeString;
 var $elm$html$Html$Events$targetValue = A2(
 	$elm$json$Json$Decode$at,
 	_List_fromArray(
@@ -5528,7 +5903,6 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
-var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$html$Html$td = _VirtualDom_node('td');
@@ -5536,8 +5910,19 @@ var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$core$String$toLower = _String_toLower;
 var $elm$html$Html$tr = _VirtualDom_node('tr');
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
 var $author$project$Main$colorInput = F2(
-	function (_v0, string) {
+	function (_v0, colorName) {
 		var inputs = _v0.inputs;
 		var colors = _v0.colors;
 		return A2(
@@ -5556,7 +5941,7 @@ var $author$project$Main$colorInput = F2(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(string + ': ')
+							$elm$html$Html$text(colorName + ': ')
 						])),
 					A2(
 					$elm$html$Html$td,
@@ -5567,13 +5952,19 @@ var $author$project$Main$colorInput = F2(
 					_List_fromArray(
 						[
 							A2(
-							$elm$html$Html$span,
+							$elm$html$Html$input,
 							_List_fromArray(
 								[
+									$elm$html$Html$Attributes$type_('color'),
+									$elm$html$Html$Attributes$value(
+									$author$project$Main$normalizeColor(
+										A2($author$project$Main$color, colorName, colors))),
+									$elm$html$Html$Events$onInput(
+									$author$project$Main$Changed(colorName)),
 									A2(
 									$elm$html$Html$Attributes$style,
 									'background-color',
-									A2($author$project$Main$color, string, colors))
+									A2($author$project$Main$color, colorName, colors))
 								]),
 							_List_Nil)
 						])),
@@ -5587,10 +5978,15 @@ var $author$project$Main$colorInput = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$Events$onInput(
-									$author$project$Main$Changed(string)),
+									$author$project$Main$Changed(colorName)),
 									$elm$html$Html$Attributes$placeholder(
 									$elm$core$String$toLower(
-										A2($author$project$Main$color, string, colors)))
+										A2($author$project$Main$color, colorName, colors))),
+									$elm$html$Html$Attributes$value(
+									A2(
+										$elm$core$Maybe$withDefault,
+										'',
+										A2($elm$core$Dict$get, colorName, inputs)))
 								]),
 							_List_Nil)
 						]))
@@ -5612,6 +6008,113 @@ var $author$project$Main$viewColorInputs = function (model) {
 				$elm$core$Tuple$first,
 				$elm$core$Dict$toList(model.colors))));
 };
+var $author$project$Main$OpenRequested = {$: 'OpenRequested'};
+var $author$project$Main$SaveRequested = {$: 'SaveRequested'};
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$p = _VirtualDom_node('p');
+var $author$project$Main$viewJsonStatus = function (status) {
+	switch (status.$) {
+		case 'Idle':
+			return A2(
+				$elm$html$Html$p,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('')
+					]));
+		case 'Succeed':
+			return A2(
+				$elm$html$Html$p,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Loaded.')
+					]));
+		case 'Opening':
+			return A2(
+				$elm$html$Html$p,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Opening...')
+					]));
+		default:
+			var message = status.a;
+			return A2(
+				$elm$html$Html$p,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Error: ' + message)
+					]));
+	}
+};
+var $author$project$Main$viewJsonIO = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('json-io')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('json-io-inputs')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$Main$SaveRequested)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Save')
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$Main$OpenRequested)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Open')
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('json-io-status')
+					]),
+				_List_fromArray(
+					[
+						$author$project$Main$viewJsonStatus(model.status)
+					]))
+			]));
+};
 var $author$project$Main$viewInputs = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -5621,7 +6124,8 @@ var $author$project$Main$viewInputs = function (model) {
 			]),
 		_List_fromArray(
 			[
-				$author$project$Main$viewColorInputs(model)
+				$author$project$Main$viewColorInputs(model),
+				$author$project$Main$viewJsonIO(model)
 			]));
 };
 var $elm$json$Json$Encode$bool = _Json_wrap;
@@ -5633,6 +6137,7 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
+var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Main$viewNavigation = F2(
 	function (colors, list) {
 		return A2(
@@ -5787,7 +6292,6 @@ var $author$project$Main$viewAddTask = function (_v0) {
 					]))
 			]));
 };
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$html$Html$Attributes$src = function (url) {
 	return A2(
@@ -6216,7 +6720,6 @@ var $author$project$Main$viewTodoDetail = function (_v0) {
 			]));
 };
 var $elm$html$Html$label = _VirtualDom_node('label');
-var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$viewTaskInfoItem = F3(
 	function (title, _default, colors) {
 		return A2(
