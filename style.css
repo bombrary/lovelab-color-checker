@@ -1,4 +1,29 @@
+body {
+  font-family: "Hiragino Kaku Gothic Pro","Meiryo","MS Pgothic",knowledge-reg,helvetica,arial,sans-serif;
+  color: #333;
+}
+h1,h2 {
+  color: #333;
+}
+.app-description {
+  margin: 0 200px;
+  margin-top: 50px;
+}
+.app-description p {
+  margin: 10px;
+}
+.app-description > ul > li {
+  margin-top: 10px;
+}
+.app-description > ul > li > ul > li {
+  margin-top: 5px;
+}
+
+.app {
+  margin: 0 auto
+}
 .wrapper {
+  margin: 50px 90px 0 90px;
   display: flex;
   flex-direction: row;
 }

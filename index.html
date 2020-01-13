@@ -8,12 +8,41 @@
     <title>Color Checker</title>
   </head>
   <body>
-    <div id="elm"></div>
-    <script src="./main.js"></script>
-    <script>
-      const app = Elm.Main.init({
-        node: document.getElementById('elm')
-      })
-    </script>
+    <section class="app-description">
+      <h1>LoveLab Color Checker</h1>
+      LoveLabの配色を確認するためのツールです。
+      <h2>使用方法</h2>
+      <p>テキストエリアにカラーコードを入力すると、それに対応したUI部品の色が変化します。</p>
+      <p>色をクリックするとカラーピッカーが開くので、そこで色を変えることもできます。</p>
+      <p>気に入った色があったら、Saveボタンを押して色データを保存しましょう。Openで保存したデータを読み込みます。</p>
+      <h2>注意</h2>
+      <ul>
+        <li>画面を更新したら、入力していた色のデータは消えます。気に入った配色が見つかったら保存することを忘れずに。</li>
+        <li>どの色がどのUI部品に対応しているかは、大体察しがつくと思います。多くのものは次の命名規則に従っています。
+          <ul>
+            <li>fg = foreground; 文字色</li>
+            <li>bg = background; 背景色</li>
+          </ul>
+        </li>
+        <li>配色については以下のサイトが参考になります。
+          <ul>
+            <li><a href="http://materialuicolors.co">Material UI Colors</a>: マテリアルデザイン用のカラーパレット</li>
+            <li><a href="https://hue360.herokuapp.com">Hue360</a>: ある色を選ぶと、それに合う色以外が選択できなくなる</li>
+            <li><a href="https://colorable.jxnblk.com/d5dadd/149cf0">Colorble</a>: 文字色と背景色とのコントラストから視認性を確かめる</li>
+            <li><a href="http://colormind.io">Colormind</a>: 一部の色をロックしながら、それに適する配色を自動生成する</li>
+          </ul>
+        </li>
+      </ul>
+
+    </section>
+    <section class="app">
+      <div id="elm"></div>
+      <script src="./main.js"></script>
+      <script>
+        const app = Elm.Main.init({
+          node: document.getElementById('elm')
+        })
+      </script>
+    </section>
   </body>
 </html>
